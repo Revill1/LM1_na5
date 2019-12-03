@@ -7,104 +7,124 @@ import java.util.Scanner;
 public class TicketAutomat
 {
     private static HashMap<String, Stan> mapaStanow = new HashMap<String, Stan>();
+    private static final String WART_ZM = "ZM";
+    private static final String WART_B = "B";
+    private static final String WART_BR1 = "BR1";
+    private static final String WART_BR2 = "BR2";
+    private static final String WART_BS = "BS";
+    private static final String WART_BSR1 = "BSR1";
+    private static final String WART_BSR2 = "BSR2";
+    private static final String WART_BSR3 = "BSR3";
+    private static final String WART_B2H = "B2H";
+    private static final String WART_B2HR1 = "B2HR1";
+    private static final String WART_B2HR2 = "B2HR2";
+    private static final String WART_B2HR3 = "B2HR3";
+    private static final String WART_B2HR4 = "B2HR4";
+    private static final String WART_BS2H = "BS2H";
+    private static final String KONIEC = "K";
+    private static final String BASEN_2H = "B2h";
+    private static final String ZWROT_MONET = "Z";
+    private static ArrayList<String> LISTA_ODWIEDZONYCH_STANOW = new ArrayList<String>();
+    private static String AKTUALNY_STAN = "q0";
+    private static int ILOSC_MONET = 0;
 
     public static void main(String[] args)
     {
         System.out.println("Witaj! Wrzuć monety (1,2,5) aby kupić bilet. Dostępne bilety:9zł - 1h pływalnia, 12zł - 1h pływalnia z sauną, 15zł - 2h pływalnia, 20zł - 2h pływalnia z sauną");
         System.out.println("Aby otrzymać zwrot monet, wpisz Z. Aby kupić bilet wpisz K, Aby wybrać 2h bilet na basen wpisz B2");
         Scanner input = new Scanner(System.in);
-        String value = "";
+        String wartosc = "";
+        mapaStanow = inicjujDane();
+
         do
         {
             System.out.println("Wrzuc monetę: ");
-            value = input.next();
+            wartosc = input.next();
+            przejdzDoStanu(wartosc, AKTUALNY_STAN);
 
         }
-        while (!value.equals("K"));
+        while (!wartosc.equals("K"));
+        System.out.println("Odwiedzone stany:" + LISTA_ODWIEDZONYCH_STANOW);
+        System.out.println("Stan koncowy:" + LISTA_ODWIEDZONYCH_STANOW.get(LISTA_ODWIEDZONYCH_STANOW.size() - 1));
+        System.out.println("Wrzucone monety:" + ILOSC_MONET);
 
+
+    }
+
+    private static void przejdzDoStanu(String wartosc, String stan)
+    {
+
+        Stan aktualnyStan = mapaStanow.get(stan);
+        System.out.println("mapaStanow stan: " + mapaStanow);
+
+        if (aktualnyStan != null)
+        {
+            String nowyStan = aktualnyStan.getMapaPrzejsc().get(wartosc);
+            if(WART_ZM.equals(wartosc))
+            {
+                ILOSC_MONET = 0;
+            }
+            else if ("1".equals( wartosc ) || "2".equals( wartosc ) || "5".equals(wartosc))
+            {
+                ILOSC_MONET += Integer.parseInt(wartosc);
+            }
+
+            LISTA_ODWIEDZONYCH_STANOW.add(nowyStan);
+            AKTUALNY_STAN = nowyStan;
+            System.out.println("aktualny stan: " + nowyStan);
+            System.out.println("Wrzucono: " + ILOSC_MONET);
+
+
+        }
     }
 
     private static HashMap<String, Stan> inicjujDane()
     {
-        String wartZM = "ZM";
-        String wartB = "B";
-        String wartBR1 = "BR1";
-        String wartBR2 = "BR2";
-        String wartBS = "BS";
-        String wartBSR1 = "BSR1";
-        String wartBSR2 = "BSR2";
-        String wartBSR3 = "BSR3";
-        String wartB2H = "B2H";
-        String wartB2HR1 = "B2HR1";
-        String wartB2HR2 = "B2HR2";
-        String wartB2HR3 = "B2HR3";
-        String wartB2HR4 = "B2HR4";
-        String wartBS2H = "BS2H";
-        String koniec = "K";
-        String basen2h = "B2h";
-        String zwrotMonet = "Z";
         HashMap<String, Stan> mapaNowychStanow = new HashMap<String, Stan>();
 
-        ustawWstepnePrzejscia(mapaNowychStanow);
+        mapaNowychStanow = ustawWstepnePrzejscia(mapaNowychStanow);
 
-        mapaNowychStanow.get("q0").mapaPrzejsc.put(wartZM, "q0");
-        mapaNowychStanow.get("q0").mapaPrzejsc.put(koniec, "q0");
-        mapaNowychStanow.get("q0").mapaPrzejsc.put(wartB2H, "q0");
+        mapaNowychStanow.get("q0").mapaPrzejsc.put(WART_ZM, "q0");
+        mapaNowychStanow.get("q0").mapaPrzejsc.put(KONIEC, "q0");
+        mapaNowychStanow.get("q0").mapaPrzejsc.put(WART_B2H, "q0");
 
         for (int i = 1; i < 20; i++)
         {
-            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, "q" + i);
+            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, "q" + i);
             if (i >= 9)
             {
-                przejsciaDlaWartosciKonczacych(mapaNowychStanow, i);
+                mapaNowychStanow =  przejsciaDlaWartosciKonczacych(mapaNowychStanow, i);
             } else
             {
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, "q" + i);
             }
-            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
         }
 
-        przejsciaDlaStanowKonczacych(mapaNowychStanow);
+        mapaNowychStanow = przejsciaDlaStanowKonczacych(mapaNowychStanow);
 
         System.out.println(mapaNowychStanow);
 
         return mapaNowychStanow;
     }
 
-    private static void przejsciaDlaStanowKonczacych(HashMap<String, Stan> mapaNowychStanow)
+    private static HashMap<String, Stan> przejsciaDlaStanowKonczacych(HashMap<String, Stan> mapaNowychStanow)
     {
-        String wartZM = "ZM";
-        String wartB = "B";
-        String wartBR1 = "BR1";
-        String wartBR2 = "BR2";
-        String wartBS = "BS";
-        String wartBSR1 = "BSR1";
-        String wartBSR2 = "BSR2";
-        String wartBSR3 = "BSR3";
-        String wartB2H = "B2H";
-        String wartB2HR1 = "B2HR1";
-        String wartB2HR2 = "B2HR2";
-        String wartB2HR3 = "B2HR3";
-        String wartB2HR4 = "B2HR4";
-        String wartBS2H = "BS2H";
-        String koniec = "K";
-        String basen2h = "B2h";
-        String zwrotMonet = "Z";
         ArrayList<String> tablicaStanowKonczacych = new ArrayList<String>();
-        tablicaStanowKonczacych.add(wartZM);
-        tablicaStanowKonczacych.add(wartB);
-        tablicaStanowKonczacych.add(wartB2H);
-        tablicaStanowKonczacych.add(wartB2HR1);
-        tablicaStanowKonczacych.add(wartB2HR2);
-        tablicaStanowKonczacych.add(wartB2HR3);
-        tablicaStanowKonczacych.add(wartB2HR4);
-        tablicaStanowKonczacych.add(wartBR1);
-        tablicaStanowKonczacych.add(wartBR2);
-        tablicaStanowKonczacych.add(wartBS);
-        tablicaStanowKonczacych.add(wartBS2H);
-        tablicaStanowKonczacych.add(wartBSR1);
-        tablicaStanowKonczacych.add(wartBSR2);
-        tablicaStanowKonczacych.add(wartBSR3);
+        tablicaStanowKonczacych.add(WART_ZM);
+        tablicaStanowKonczacych.add(WART_B);
+        tablicaStanowKonczacych.add(WART_B2H);
+        tablicaStanowKonczacych.add(WART_B2HR1);
+        tablicaStanowKonczacych.add(WART_B2HR2);
+        tablicaStanowKonczacych.add(WART_B2HR3);
+        tablicaStanowKonczacych.add(WART_B2HR4);
+        tablicaStanowKonczacych.add(WART_BR1);
+        tablicaStanowKonczacych.add(WART_BR2);
+        tablicaStanowKonczacych.add(WART_BS);
+        tablicaStanowKonczacych.add(WART_BS2H);
+        tablicaStanowKonczacych.add(WART_BSR1);
+        tablicaStanowKonczacych.add(WART_BSR2);
+        tablicaStanowKonczacych.add(WART_BSR3);
 
         for (String stan : tablicaStanowKonczacych)
         {
@@ -112,99 +132,84 @@ public class TicketAutomat
             mapka.put("1", stan);
             mapka.put("2", stan);
             mapka.put("5", stan);
-            mapka.put(koniec, stan);
-            mapka.put(zwrotMonet, stan);
-            mapka.put(basen2h, stan);
+            mapka.put(KONIEC, stan);
+            mapka.put(ZWROT_MONET, stan);
+            mapka.put(BASEN_2H, stan);
             mapaNowychStanow.put(stan, new Stan(stan, mapka));
         }
+        return  mapaNowychStanow;
     }
 
-    private static void przejsciaDlaWartosciKonczacych(HashMap<String, Stan> mapaNowychStanow, int i)
+    private static HashMap<String, Stan> przejsciaDlaWartosciKonczacych(HashMap<String, Stan> mapaNowychStanow, int i)
     {
-        String wartZM = "ZM";
-        String wartB = "B";
-        String wartBR1 = "BR1";
-        String wartBR2 = "BR2";
-        String wartBS = "BS";
-        String wartBSR1 = "BSR1";
-        String wartBSR2 = "BSR2";
-        String wartBSR3 = "BSR3";
-        String wartB2H = "B2H";
-        String wartB2HR1 = "B2HR1";
-        String wartB2HR2 = "B2HR2";
-        String wartB2HR3 = "B2HR3";
-        String wartB2HR4 = "B2HR4";
-        String wartBS2H = "BS2H";
-        String koniec = "K";
-        String basen2h = "B2h";
-        String zwrotMonet = "Z";
-
         switch (i)
         {
             case 9:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartB);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_B);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 10:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBR1);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BR1);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 11:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBR2);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BR2);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 12:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBS);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BS);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 13:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBSR1);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BSR1);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 14:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBSR2);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BSR2);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 15:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBSR3);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, basen2h);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BSR3);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, BASEN_2H);
                 break;
             case 16:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartB2HR1);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_B2HR1);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 17:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartB2HR2);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_B2HR2);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 18:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartB2HR3);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_B2HR3);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 19:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartB2HR4);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_B2HR4);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
             case 20:
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(koniec, wartBS2H);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartZM, zwrotMonet);
-                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(wartB2H, "q" + i);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, WART_BS2H);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
+                mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
                 break;
         }
+
+        return mapaNowychStanow;
     }
 
-    private static void ustawWstepnePrzejscia(HashMap<String, Stan> mapaStanow)
+    private static HashMap<String, Stan> ustawWstepnePrzejscia(HashMap<String, Stan> mapaStanow)
     {
         for (int i = 0; i < 20; i++)
         {
@@ -228,5 +233,7 @@ public class TicketAutomat
             }
             mapaStanow.put(nazwaStanu, new Stan(nazwaStanu, mapaPrzejsc));
         }
+
+        return mapaStanow;
     }
 }
