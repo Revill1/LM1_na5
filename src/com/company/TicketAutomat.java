@@ -35,6 +35,14 @@ public class TicketAutomat
         Scanner input = new Scanner(System.in);
         String wartosc = "";
         mapaStanow = inicjujDane();
+        for (Stan stany : mapaStanow.values())
+        {
+            for (String wart : stany.getMapaPrzejsc().keySet())
+            {
+                System.out.println(stany.getNazwa() + " dla wartosci " + wart + " -> " +  stany.getMapaPrzejsc().get(wart));
+            }
+            System.out.println();
+        }
 
         do
         {
@@ -47,19 +55,22 @@ public class TicketAutomat
         System.out.println("Odwiedzone stany:" + LISTA_ODWIEDZONYCH_STANOW);
         System.out.println("Stan koncowy:" + LISTA_ODWIEDZONYCH_STANOW.get(LISTA_ODWIEDZONYCH_STANOW.size() - 1));
         System.out.println("Wrzucone monety:" + ILOSC_MONET);
-
-
     }
 
     private static void przejdzDoStanu(String wartosc, String stan)
     {
 
         Stan aktualnyStan = mapaStanow.get(stan);
-        System.out.println("mapaStanow stan: " + mapaStanow);
+
 
         if (aktualnyStan != null)
         {
+            System.out.println("aktualnyStan : " + aktualnyStan.getNazwa());
+            System.out.println("aktualnyStan : " + aktualnyStan.getMapaPrzejsc());
+            System.out.println("wartosc : " + wartosc);
             String nowyStan = aktualnyStan.getMapaPrzejsc().get(wartosc);
+            System.out.println("nowyStan : " + nowyStan);
+
             if(WART_ZM.equals(wartosc))
             {
                 ILOSC_MONET = 0;
@@ -211,14 +222,23 @@ public class TicketAutomat
 
     private static HashMap<String, Stan> ustawWstepnePrzejscia(HashMap<String, Stan> mapaStanow)
     {
-        for (int i = 0; i < 20; i++)
+        for (int i = 0; i < 21; i++)
         {
             String nazwaStanu = "q" + i;
             HashMap<String, String> mapaPrzejsc = new HashMap<String, String>();
-            mapaPrzejsc.put("1", "q" + 1);
+            int indeksAdd1 = i+1;
+            int indeksAdd2 = i+2;
+            int indeksAdd3 = i+5;
+
+            mapaPrzejsc.put("1", "q" + indeksAdd1);
+            if(i == 20)
+            {
+                mapaPrzejsc.put("1", nazwaStanu);
+            }
+
             if (i < 18)
             {
-                mapaPrzejsc.put("2", "q" + 2);
+                mapaPrzejsc.put("2", "q" + indeksAdd2);
             } else
             {
                 mapaPrzejsc.put("2", nazwaStanu);
@@ -226,11 +246,14 @@ public class TicketAutomat
 
             if (i < 15)
             {
-                mapaPrzejsc.put("5", "q" + 5);
+                mapaPrzejsc.put("5", "q" + indeksAdd3);
             } else
             {
                 mapaPrzejsc.put("5", nazwaStanu);
             }
+            System.out.println("stan: " + nazwaStanu);
+            System.out.println("Przejscia: " + mapaPrzejsc);
+
             mapaStanow.put(nazwaStanu, new Stan(nazwaStanu, mapaPrzejsc));
         }
 
