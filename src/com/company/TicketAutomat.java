@@ -1,8 +1,6 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Scanner;
+import java.util.*;
 
 public class TicketAutomat
 {
@@ -27,6 +25,9 @@ public class TicketAutomat
     private static ArrayList<String> LISTA_ODWIEDZONYCH_STANOW = new ArrayList<String>();
     private static String AKTUALNY_STAN = "q0";
     private static int ILOSC_MONET = 0;
+    private static HashSet<String> STANY_KONCZACE = new HashSet<String>(
+            Arrays.asList(WART_B, WART_B2H, WART_B2HR1, WART_B2HR2, WART_B2HR3, WART_B2HR4, WART_BR1,
+                    WART_BR2, WART_BS, WART_BS2H, WART_BSR1, WART_BSR2, WART_BSR3, WART_BS2H, ZWROT_MONET,BASEN_2H));
 
     public static void main(String[] args)
     {
@@ -35,23 +36,44 @@ public class TicketAutomat
         Scanner input = new Scanner(System.in);
         String wartosc = "";
         mapaStanow = inicjujDane();
-        for (Stan stany : mapaStanow.values())
-        {
-            for (String wart : stany.getMapaPrzejsc().keySet())
-            {
-                System.out.println(stany.getNazwa() + " dla wartosci " + wart + " -> " +  stany.getMapaPrzejsc().get(wart));
-            }
-            System.out.println();
-        }
 
         do
         {
-            System.out.println("Wrzuc monetę: ");
+            if( AKTUALNY_STAN.equals("q9") || AKTUALNY_STAN.equals("q10") || AKTUALNY_STAN.equals("q11") )
+            {
+                System.out.println("Wciśnij 'K' aby kupić bilet 1h na basen");
+                System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
+            }
+            else if (AKTUALNY_STAN.equals("q12") || AKTUALNY_STAN.equals("q13") || AKTUALNY_STAN.equals("q14"))
+            {
+                System.out.println("Wciśnij 'K' aby kupić bilet 1h na basen i saunę");
+                System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
+            }
+            else if(AKTUALNY_STAN.equals("q15"))
+            {
+                System.out.println("Wciśnij 'K' aby kupić bilet 1h na basen + saunę i otrzymać resztę");
+                System.out.println("Wciśnij " + WART_B2H + " aby kupić bilet 2h na basen ");
+                System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
+            }
+            else if(AKTUALNY_STAN.equals("q16") || AKTUALNY_STAN.equals("q17") || AKTUALNY_STAN.equals("q18") || AKTUALNY_STAN.equals("q19"))
+            {
+                System.out.println("Wciśnij 'K' aby kupić bilet 2h na basen i otrzymać resztę");
+                System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
+            }
+            else if (!AKTUALNY_STAN.equals("q0"))
+            {
+                System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę: ");
+            }
+            else
+            {
+                System.out.println("Wrzuc monetę: ");
+            }
+
             wartosc = input.next();
             przejdzDoStanu(wartosc, AKTUALNY_STAN);
-
         }
-        while (!wartosc.equals("K"));
+        while (!STANY_KONCZACE.contains(AKTUALNY_STAN));
+
         System.out.println("Odwiedzone stany:" + LISTA_ODWIEDZONYCH_STANOW);
         System.out.println("Stan koncowy:" + LISTA_ODWIEDZONYCH_STANOW.get(LISTA_ODWIEDZONYCH_STANOW.size() - 1));
         System.out.println("Wrzucone monety:" + ILOSC_MONET);
@@ -61,31 +83,30 @@ public class TicketAutomat
     {
 
         Stan aktualnyStan = mapaStanow.get(stan);
-
+        System.out.println("aktualnyStan : " + aktualnyStan.getNazwa());
+        System.out.println("aktualnyStan : " + aktualnyStan.getMapaPrzejsc());
+        System.out.println("wartosc : " + wartosc);
 
         if (aktualnyStan != null)
         {
-            System.out.println("aktualnyStan : " + aktualnyStan.getNazwa());
-            System.out.println("aktualnyStan : " + aktualnyStan.getMapaPrzejsc());
-            System.out.println("wartosc : " + wartosc);
             String nowyStan = aktualnyStan.getMapaPrzejsc().get(wartosc);
             System.out.println("nowyStan : " + nowyStan);
-
-            if(WART_ZM.equals(wartosc))
+            if (nowyStan != null)
             {
-                ILOSC_MONET = 0;
+
+                if (WART_ZM.equals(wartosc))
+                {
+                    ILOSC_MONET = 0;
+                } else if ("1".equals(wartosc) || "2".equals(wartosc) || "5".equals(wartosc))
+                {
+                    ILOSC_MONET += Integer.parseInt(wartosc);
+                }
+
+                LISTA_ODWIEDZONYCH_STANOW.add(nowyStan);
+                AKTUALNY_STAN = nowyStan;
+                System.out.println("aktualny stan: " + nowyStan);
+                System.out.println("Wrzucono: " + ILOSC_MONET);
             }
-            else if ("1".equals( wartosc ) || "2".equals( wartosc ) || "5".equals(wartosc))
-            {
-                ILOSC_MONET += Integer.parseInt(wartosc);
-            }
-
-            LISTA_ODWIEDZONYCH_STANOW.add(nowyStan);
-            AKTUALNY_STAN = nowyStan;
-            System.out.println("aktualny stan: " + nowyStan);
-            System.out.println("Wrzucono: " + ILOSC_MONET);
-
-
         }
     }
 
@@ -102,14 +123,14 @@ public class TicketAutomat
         for (int i = 1; i < 20; i++)
         {
             mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, "q" + i);
+            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
             if (i >= 9)
             {
-                mapaNowychStanow =  przejsciaDlaWartosciKonczacych(mapaNowychStanow, i);
+                mapaNowychStanow = przejsciaDlaWartosciKonczacych(mapaNowychStanow, i);
             } else
             {
                 mapaNowychStanow.get("q" + i).mapaPrzejsc.put(KONIEC, "q" + i);
             }
-            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
         }
 
         mapaNowychStanow = przejsciaDlaStanowKonczacych(mapaNowychStanow);
@@ -137,7 +158,7 @@ public class TicketAutomat
         tablicaStanowKonczacych.add(WART_BSR2);
         tablicaStanowKonczacych.add(WART_BSR3);
 
-        for (String stan : tablicaStanowKonczacych)
+        for (String stan : STANY_KONCZACE)
         {
             HashMap<String, String> mapka = new HashMap<String, String>();
             mapka.put("1", stan);
@@ -148,7 +169,7 @@ public class TicketAutomat
             mapka.put(BASEN_2H, stan);
             mapaNowychStanow.put(stan, new Stan(stan, mapka));
         }
-        return  mapaNowychStanow;
+        return mapaNowychStanow;
     }
 
     private static HashMap<String, Stan> przejsciaDlaWartosciKonczacych(HashMap<String, Stan> mapaNowychStanow, int i)
@@ -226,12 +247,12 @@ public class TicketAutomat
         {
             String nazwaStanu = "q" + i;
             HashMap<String, String> mapaPrzejsc = new HashMap<String, String>();
-            int indeksAdd1 = i+1;
-            int indeksAdd2 = i+2;
-            int indeksAdd3 = i+5;
+            int indeksAdd1 = i + 1;
+            int indeksAdd2 = i + 2;
+            int indeksAdd3 = i + 5;
 
             mapaPrzejsc.put("1", "q" + indeksAdd1);
-            if(i == 20)
+            if (i == 20)
             {
                 mapaPrzejsc.put("1", nazwaStanu);
             }
