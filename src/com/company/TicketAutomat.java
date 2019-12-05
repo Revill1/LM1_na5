@@ -55,7 +55,7 @@ public class TicketAutomat
                 System.out.println("Wciśnij " + WART_B2H + " aby kupić bilet 2h na basen ");
                 System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
             }
-            else if(AKTUALNY_STAN.equals("q16") || AKTUALNY_STAN.equals("q17") || AKTUALNY_STAN.equals("q18") || AKTUALNY_STAN.equals("q19"))
+            else if(AKTUALNY_STAN.equals("q16") || AKTUALNY_STAN.equals("q17") || AKTUALNY_STAN.equals("q18") || AKTUALNY_STAN.equals("q19") || AKTUALNY_STAN.equals("q20"))
             {
                 System.out.println("Wciśnij 'K' aby kupić bilet 2h na basen i otrzymać resztę");
                 System.out.println("Wciśnij 'ZM' aby otrzymać zwrot monet. Wrzuc monetę jesli chcesz kontynuować: ");
@@ -70,6 +70,10 @@ public class TicketAutomat
             }
 
             wartosc = input.next();
+            if(wartosc != null)
+            {
+                wartosc = wartosc.toUpperCase();
+            }
             przejdzDoStanu(wartosc, AKTUALNY_STAN);
         }
         while (!STANY_KONCZACE.contains(AKTUALNY_STAN));
@@ -83,14 +87,9 @@ public class TicketAutomat
     {
 
         Stan aktualnyStan = mapaStanow.get(stan);
-        System.out.println("aktualnyStan : " + aktualnyStan.getNazwa());
-        System.out.println("aktualnyStan : " + aktualnyStan.getMapaPrzejsc());
-        System.out.println("wartosc : " + wartosc);
-
         if (aktualnyStan != null)
         {
             String nowyStan = aktualnyStan.getMapaPrzejsc().get(wartosc);
-            System.out.println("nowyStan : " + nowyStan);
             if (nowyStan != null)
             {
 
@@ -120,9 +119,9 @@ public class TicketAutomat
         mapaNowychStanow.get("q0").mapaPrzejsc.put(KONIEC, "q0");
         mapaNowychStanow.get("q0").mapaPrzejsc.put(WART_B2H, "q0");
 
-        for (int i = 1; i < 20; i++)
+        for (int i = 1; i < 21; i++)
         {
-            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, "q" + i);
+            mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_ZM, ZWROT_MONET);
             mapaNowychStanow.get("q" + i).mapaPrzejsc.put(WART_B2H, "q" + i);
             if (i >= 9)
             {
@@ -134,30 +133,11 @@ public class TicketAutomat
         }
 
         mapaNowychStanow = przejsciaDlaStanowKonczacych(mapaNowychStanow);
-
-        System.out.println(mapaNowychStanow);
-
         return mapaNowychStanow;
     }
 
     private static HashMap<String, Stan> przejsciaDlaStanowKonczacych(HashMap<String, Stan> mapaNowychStanow)
     {
-        ArrayList<String> tablicaStanowKonczacych = new ArrayList<String>();
-        tablicaStanowKonczacych.add(WART_ZM);
-        tablicaStanowKonczacych.add(WART_B);
-        tablicaStanowKonczacych.add(WART_B2H);
-        tablicaStanowKonczacych.add(WART_B2HR1);
-        tablicaStanowKonczacych.add(WART_B2HR2);
-        tablicaStanowKonczacych.add(WART_B2HR3);
-        tablicaStanowKonczacych.add(WART_B2HR4);
-        tablicaStanowKonczacych.add(WART_BR1);
-        tablicaStanowKonczacych.add(WART_BR2);
-        tablicaStanowKonczacych.add(WART_BS);
-        tablicaStanowKonczacych.add(WART_BS2H);
-        tablicaStanowKonczacych.add(WART_BSR1);
-        tablicaStanowKonczacych.add(WART_BSR2);
-        tablicaStanowKonczacych.add(WART_BSR3);
-
         for (String stan : STANY_KONCZACE)
         {
             HashMap<String, String> mapka = new HashMap<String, String>();
@@ -249,7 +229,7 @@ public class TicketAutomat
             HashMap<String, String> mapaPrzejsc = new HashMap<String, String>();
             int indeksAdd1 = i + 1;
             int indeksAdd2 = i + 2;
-            int indeksAdd3 = i + 5;
+            int indeksAdd5 = i + 5;
 
             mapaPrzejsc.put("1", "q" + indeksAdd1);
             if (i == 20)
@@ -265,15 +245,13 @@ public class TicketAutomat
                 mapaPrzejsc.put("2", nazwaStanu);
             }
 
-            if (i < 15)
+            if (i < 16)
             {
-                mapaPrzejsc.put("5", "q" + indeksAdd3);
+                mapaPrzejsc.put("5", "q" + indeksAdd5);
             } else
             {
                 mapaPrzejsc.put("5", nazwaStanu);
             }
-            System.out.println("stan: " + nazwaStanu);
-            System.out.println("Przejscia: " + mapaPrzejsc);
 
             mapaStanow.put(nazwaStanu, new Stan(nazwaStanu, mapaPrzejsc));
         }
